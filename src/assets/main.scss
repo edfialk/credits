@@ -3,3 +3,61 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.text-primary {
+  @apply text-gray-200;
+}
+
+.bg-light {
+  @apply bg-gray-600;
+}
+
+.bg-primary {
+  @apply bg-gray-900;
+}
+
+.card {
+  @apply mt-3 bg-gray-800 py-4 px-6 rounded-lg shadow;
+  h1 {
+    @apply mb-2 text-xl font-bold text-white;
+  }
+  p {
+      @apply font-normal text-gray-400;
+  }
+  sub {
+    @apply text-sm text-gray-600;
+  }
+  &.inactive {
+    @apply bg-gray-900 brightness-75;
+  }
+}
+
+.best-card {
+  @apply bg-emerald-600 text-gray-900;
+  p {
+    @apply text-white;
+  }
+  p.sub {
+    @apply mt-2 text-gray-300;
+  }
+}
+
+.tabs {
+  ul.tab-links {
+    @apply flex flex-wrap text-sm font-medium text-center justify-between mb-4;
+    button {
+      @apply inline-block p-4 border-b-2 border-transparent;
+    }
+    button.active {
+      @apply border-white;
+    }
+  }
+  .tab-content {
+    & > div {
+      @apply hidden p-4;
+      &.active {
+        @apply block;
+      }
+    }
+  }
+}
