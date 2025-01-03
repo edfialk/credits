@@ -1,50 +1,36 @@
 import { defineStore } from 'pinia'
-import db from '../db'
+import { useFirestore } from "vuefire";
+import { collection, getDocs, where, query, doc } from "firebase/firestore";
+
+const firedb = useFirestore();
 
 export const usePlacesStore = defineStore('places', {
     state: () => ({
         places: [],
-        cards: [],
         fetching: false,
         ready: false,
     }),
     getters: {
         getPlaceById: (state) => {
-            return (id) => state.places.find(c => c.id == id)
+            return (id) => state.places.find(item => item.id == id)
         },
-        getReady: (state) => state.ready
     },
     actions: {
         async fetch() {
             this.places = []
             this.ready = false
             this.fetching = true
-            const { data, error } = await db.from('places').select()
-            console.log('places', data)
-            this.places = data
-            this.fetching = false
-            this.ready = true
-        },
-        async fetchCards(place_id) {
-            this.cards = []
-            this.ready = false
-            this.fetching = true
-            const { data, error } = await db.from('bonuses').select(`
-                text,
-                value,
-                cards ( 
-                    name
-                )
-            `)
-            .eq('place_id', place_id)
-            this.cards = data.map((c) => ({
-                name: c.cards.name,
-                text: c.text,
-                value: c.value
-            }))
-            this.fetching = false
-            this.ready = true
-            console.log('places cards', data)
+
+            try{
+                const snapshot = await getDocs(collection(firedb, "places"))
+                this.places = snapshot.docs.map(d => ({ id: d.id, ...d.data() }))
+                console.log('places', this.places)
+            } catch (error) {
+                console.error('Error getting places: ', error)
+            } finally {
+                this.fetching = false
+                this.ready = true
+            }
         },
     }
 })

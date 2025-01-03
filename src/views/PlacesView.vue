@@ -5,7 +5,7 @@
         <router-link :to="'/place/' + place.id">
           <div class="flex justify-between items-center">
             <p class="text-lg">{{ place.name }}</p>
-            <p>{{ bestCard(place) ? bestCard(place).name : '' }}</p>
+            <p>{{ bestCard(place) ? bestCard(place) : '' }}</p>
           </div>
         </router-link>
       </template>
@@ -37,9 +37,9 @@ const openModal = () => {
 }
 
 const bestCard = (place) => {
-  const bonus = bonuses.value.filter(b => b.places.id == place.id)
+  const bonus = bonuses.value.filter(b => b.place.id == place.id)
       .sort((a,b) => b.value - a.value)
       .shift()
-  return bonus.cards
+  return bonus ? bonus.card.name : null
 }
 </script>

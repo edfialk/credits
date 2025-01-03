@@ -1,17 +1,18 @@
 import { defineStore } from 'pinia'
-import db from '../db'
+import { useFirestore } from "vuefire";
+import { collection, getDocs, getDoc, where, query, doc } from "firebase/firestore";
+
+const firedb = useFirestore();
 
 export const useCardsStore = defineStore('cards', {
     state: () => ({
         cards: [],
-        places: [],
+        // places: [],
         fetching: false,
         ready: false,
     }),
     getters: {
-        getCardById: (state) => {
-            return (id) => state.cards.find(c => c.id == id)
-        },
+        getCardById: (state) => (id) => state.cards.find(c => c.id == id),
         getCards: (state) => state.cards,
     },
     actions: {
@@ -19,9 +20,13 @@ export const useCardsStore = defineStore('cards', {
             this.cards = []
             this.ready = false
             this.fetching = true
-            const { data, error } = await db.from('cards').select()
-            console.log('cards', data)
-            this.cards = data
+            const s = await getDocs(collection(firedb, "cards"))
+            s.docs.forEach((d) => {
+                const data = d.data()
+                const card = { id: d.id, ...data }
+                this.cards.push(card)
+            })
+            console.log('cards', this.cards)
             this.fetching = false
             this.ready = true
         },

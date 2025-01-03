@@ -10,6 +10,7 @@ export const useAppStore = defineStore('app', {
     actions: {
         setTitle(title) {
             this._title = title
+            document.title = title
         }
     }
 })

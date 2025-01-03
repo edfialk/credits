@@ -85,7 +85,7 @@
       <router-link :to="'/offer/' + offer.id">
         <div class="card">
           <h1>{{ offer.title }} - {{ offer.current_value }}</h1>
-          <h3>{{ offer.cards.name }}</h3>
+          <h3>{{ offer.card }}</h3>
           <p>Use by {{ dayjs(offer.reset).format('MMMM DD, YYYY') }}</p>
         </div>
       </router-link>

@@ -6,6 +6,8 @@ dayjs.extend(localizedFormat)
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+import { VueFire } from 'vuefire'
+import { firebaseApp } from './firedb'
 
 import App from './App.vue'
 import router from './router'
@@ -18,20 +20,16 @@ import { useBonusesStore } from '@/stores/bonuses'
 
 const app = createApp(App)
 
+app.use(VueFire, {
+    firebaseApp
+})
 app.use(createPinia())
 app.use(router)
 
 app.mount('#app')
 
 
-const cardsStore = useCardsStore()
-cardsStore.fetch()
-
-const placesStore = usePlacesStore()
-placesStore.fetch()
-
-const offersStore = useOffersStore()
-offersStore.fetch()
-
-const bonusesStore = useBonusesStore()
-bonusesStore.fetch()
+useCardsStore().fetch()
+usePlacesStore().fetch()
+useOffersStore().fetch()
+useBonusesStore().fetch()

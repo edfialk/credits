@@ -38,6 +38,11 @@ const router = createRouter({
       path: '/offer/:id',
       name: 'offer',
       component: () => import('../views/OfferView.vue')
+    },
+    {
+      path: '/convert',
+      name: 'convert',
+      component: () => import('../Convert.vue')
     }
 /*     {
       path: '/about',

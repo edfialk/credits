@@ -35,7 +35,7 @@
           <template v-for="bonus in bonuses" :key="bonus.id">
             <div class="flex justify-between">
               <p class="text-lg text-white text-bold">
-                {{ bonus.places.name }}
+                {{ bonus.place.name }}
               </p>
               <p>
                 {{ bonus.value }}
@@ -72,28 +72,17 @@ const appStore = useAppStore()
 const placesStore = usePlacesStore()
 const bonusesStore = useBonusesStore()
 const route = useRoute()
+const id = route.params.id
 
-const card = computed(() => cardsStore.getCardById(route.params.id))
+const card = computed(() => cardsStore.getCardById(id))
 const bonuses = computed(() =>
   bonusesStore
-    .getBonusesByCard(route.params.id)
-    .sort((a, b) => a.places.name.localeCompare(b.places.name))
+    .getBonusesByCard(id)
+    .sort((a, b) => a.place.name.localeCompare(b.place.name))
 )
 
 onMounted(() => {
   initFlowbite()
-  if (cardsStore.ready) {
-    appStore.setTitle(card.value.name)
-  } else {
-    appStore.setTitle('')
-
-    watch(
-      () => cardsStore.ready,
-      () => {
-        appStore.setTitle(card.value.name)
-      }
-    )
-  }
 })
 
 const tabs = ref(null)

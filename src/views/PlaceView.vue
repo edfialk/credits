@@ -1,12 +1,14 @@
 <template>
   <div>
-    <div class="grid grid-cols-1 gap-2 px-2" v-if="usedCards">
-      <template v-for="(card, i) in usedCards" v-key="card.id">
-        <div class="card" :class="{ 'best-card': i == 0 }">
-          <h1>{{ card.name }}</h1>
-					<p>Value: {{ card.value }}</p>
-					<p class="sub">{{ card.text }}</p>
-        </div>
+    <div class="grid grid-cols-1 gap-2 px-2" v-if="bonuses">
+      <template v-for="(bonus, i) in bonuses" v-key="card.id">
+        <router-link :to="'/card/' + bonus.card.id">
+          <div class="card" :class="{ 'best-card': i == 0 }">
+            <h1>{{ bonus.card.name }}</h1>
+            <p>Value: {{ bonus.value }}</p>
+            <p class="sub">{{ bonus.text }}</p>
+          </div>
+        </router-link>
       </template>
     </div>
 
@@ -45,8 +47,12 @@
         <!-- Modal content -->
         <div class="relative rounded-lg shadow bg-gray-700">
           <!-- Modal header -->
-          <div class="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
-            <h3 class="text-xl font-semibold text-gray-900 dark:text-white">New Card Interaction</h3>
+          <div
+            class="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600"
+          >
+            <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+              New Card Interaction
+            </h3>
             <button
               type="button"
               class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
@@ -74,7 +80,9 @@
           <div class="px-6 py-6 lg:px-8">
             <form class="space-y-6" action="#" @submit.prevent="onNewActionSubmit">
               <div>
-                <label for="card" class="block mb-2 text-sm font-medium text-white">Card</label>
+                <label for="card" class="block mb-2 text-sm font-medium text-white"
+                  >Card</label
+                >
                 <select
                   id="card"
                   v-model="newCardId"
@@ -132,67 +140,57 @@
 </template>
 
 <script setup>
-import { usePlacesStore } from '@/stores/places'
-import { useAppStore } from '@/stores/app'
-import { useCardsStore } from '@/stores/cards'
-import { useBonusesStore } from '@/stores/bonuses'
-import { computed, watch, onMounted, ref } from 'vue'
-import { initFlowbite, Modal } from 'flowbite'
-import { useRoute } from 'vue-router'
+import { usePlacesStore } from "@/stores/places";
+import { useCardsStore } from "@/stores/cards";
+import { useBonusesStore } from "@/stores/bonuses";
+import { computed, watch, onMounted, ref } from "vue";
+import { initFlowbite, Modal } from "flowbite";
+import { useRoute } from "vue-router";
 
 let modal;
 
 onMounted(() => {
-  initFlowbite()
-	modal = new Modal(document.getElementById('actionModal'))
-})
+  initFlowbite();
+  modal = new Modal(document.getElementById("actionModal"));
+});
 
-const route = useRoute()
-const placesStore = usePlacesStore()
-const appStore = useAppStore()
-const cardsStore = useCardsStore()
-const bonusesStore = useBonusesStore()
+const route = useRoute();
+const placesStore = usePlacesStore();
+const cardsStore = useCardsStore();
+const bonusesStore = useBonusesStore();
 
-const place = computed(() => placesStore.getPlaceById(route.params.id))
-const newCardId = ref(null)
-const newValue = ref(null)
-const newText = ref(null)
+const id = route.params.id;
+const place = computed(() => placesStore.getPlaceById(id));
+const newCardId = ref(null);
+const newValue = ref(null);
+const newText = ref(null);
 
-placesStore.fetchCards(route.params.id)
+const bonuses = computed(() =>
+  bonusesStore.getBonusesByPlace(id).sort((a, b) => b.value - a.value)
+);
 
-const usedCards = computed(() => placesStore.cards.sort((a, b) => b.value - a.value))
 const unusedCards = computed(() => {
   if (cardsStore.ready) {
-    const cards = cardsStore.getCards
+    const cards = cardsStore.getCards;
     return cards
-      .filter((c) => usedCards.value.findIndex((i) => i.id == c.id) == -1)
-      .sort((a, b) => a.name.localeCompare(b.name))
+      .filter((c) => bonuses.value.findIndex((i) => i.id == c.id) == -1)
+      .sort((a, b) => a.name.localeCompare(b.name));
   }
-  return []
-})
-
-appStore.setTitle('')
-
-watch(
-  () => placesStore.ready,
-  () => {
-    appStore.setTitle(place.value.name)
-  }
-)
+  return [];
+});
 
 const onNewActionSubmit = () => {
-	bonusesStore.saveBonus(place.value.id, newCardId.value, newValue.value, newText.value)
-	placesStore.fetchCards(route.params.id)
-	modal.hide()
-}
+  bonusesStore.saveBonus(place.value.id, newCardId.value, newValue.value, newText.value);
+  placesStore.fetchCards(route.params.id);
+  modal.hide();
+};
 
 const openModal = () => {
-  newCardId.value = unusedCards.value[0].id
-	modal.show()
-}
+  newCardId.value = unusedCards.value[0].id;
+  modal.show();
+};
 
 const closeModal = () => {
-	modal.hide()
-}
-
+  modal.hide();
+};
 </script>

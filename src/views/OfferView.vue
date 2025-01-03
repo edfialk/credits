@@ -1,7 +1,7 @@
 <template>
   <div class="px-2">
-    <div class="card" v-if="loaded">
-      <h1>{{ myOffer.cards.name }}</h1>
+    <div class="card" v-if="myOffer.card">
+      <h1>{{ myOffer.card }}</h1>
       <h3>{{ myOffer.title }} - ${{ myOffer.current_value }} remaining</h3>
       <div class="flex items-center">
         <p>0</p>
@@ -22,13 +22,16 @@
 
       <p class="text-sm mt-2">{{ myOffer.text }}</p>
     </div>
+    <div class="card" v-if="loaded && !myOffer.card">
+      somethin fked up, tell Ed offer {{ route.params.id }} is broke
+    </div>
   </div>
 </template>
 
 <script setup>
 import { useOffersStore } from '@/stores/offers'
 import { useAppStore } from '@/stores/app'
-import { reactive, watch, ref } from 'vue'
+import { reactive, watch, ref, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 import dayjs from 'dayjs'
 
@@ -40,20 +43,14 @@ const myOffer = reactive({})
 const loaded = ref(false)
 appStore.setTitle('Offer Details')
 
-if (offersStore.ready) {
-  Object.assign(myOffer, offersStore.offers[route.params.id])
-  loaded.value = true
-} else {
-  watch(
-    () => offersStore.ready,
-    () => {
-      if (!loaded.value) {
-        Object.assign(myOffer, offersStore.offers[route.params.id])
-        loaded.value = true
-      }
-    }
-  )
-}
+
+watchEffect(() => {
+  if (offersStore.ready) {
+    const offer = offersStore.getOfferById(route.params.id);
+    Object.assign(myOffer, offer);
+    loaded.value = true;
+  }
+});
 
 const onOfferValueChange = (e) => {
   const isActive = e.target.value != 0

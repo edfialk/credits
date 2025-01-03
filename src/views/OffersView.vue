@@ -1,35 +1,13 @@
 <template>
   <div class="grid grid-cols-1 gap-2 px-2 pb-20">
-    <template v-for="offer in myOffers">
+    <template v-for="offer in offers">
       <router-link :to="'/offer/' + offer.id">
         <div class="card" :class="{ inactive: offer.current_value == 0 }">
           <h1>{{ offer.title }} - ${{ offer.current_value }}</h1>
-          <h3>{{ offer.cards.name }}</h3>
-
-          <!-- <label
-            for="default-range"
-            class="block text-sm font-medium text-white"
-            >Used</label
-          > -->
-          <!-- <div class="flex items-center">
-            <p>0</p>
-            <input
-              :data-offer-id="offer.id"
-              type="range"
-              :value="offer.current_value"
-              :max="offer.max_value"
-              class="w-full mx-2 h-2 rounded-lg appearance-none cursor-pointer bg-gray-700"
-              @change="onOfferValueChange"
-              @input="onOfferValueInput"
-            />
-            <p>{{ offer.max_value }}</p>
-          </div> -->
-
+          <h3>{{ offer.card }}</h3>
           <p class="text-sm">
             Expires: {{ dayjs(offer.reset).format('MMMM D') }}, resets {{ offer.frequency }}
           </p>
-
-          <!-- <p class="text-sm mt-2">{{ offer.text }}</p> -->
         </div>
       </router-link>
     </template>
@@ -229,27 +207,10 @@ const appStore = useAppStore()
 const placesStore = usePlacesStore()
 
 const cards = computed(() => cardsStore.cards.sort((a, b) => a.name.localeCompare(b.name)))
-const offers = computed(() => offersStore.offers)
 const places = computed(() => placesStore.places.sort((a, b) => a.name.localeCompare(b.name)))
-
-const myOffers = ref([])
-
-if (offersStore.ready) {
-  myOffers.value = Object.values(offersStore.offers).sort((a, b) => {
-    if (a.is_active == b.is_active) return a.cards.name.localeCompare(b.cards.name)
-    return b.is_active - a.is_active
-  })
-} else {
-  watch(
-    () => offersStore.offers,
-    () => {
-      myOffers.value = Object.values(offersStore.offers).sort((a, b) => {
-        if (a.is_active == b.is_active) return a.cards.name.localeCompare(b.cards.name)
-        return b.is_active - a.is_active
-      })
-    }
-  )
-}
+const offers = computed(() => offersStore.offers.sort((a, b) => {
+  return b.current_value - a.current_value
+}))
 
 const form = reactive({
   title: null,

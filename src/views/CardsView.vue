@@ -9,7 +9,7 @@
                     <div class="flex items-center justify-start">
                         <template v-for="bonus in bonuses(card)">
                             <div class="flex flex-col items-center mr-3">
-                                <i :class="bonus.places.icon"></i>
+                                <i :class="bonus.place.icon"></i>
                                 <p class="text-sm text-gray-600">{{ bonus.value }}</p>
                             </div>
                         </template>
@@ -38,7 +38,9 @@ appStore.setTitle('Cards')
 const cards = computed(() => cardsStore.cards.sort((a,b) => a.name.localeCompare(b.name)))
 
 const bonuses = (card) => {
-    return bonusesStore.getBonusesByCard(card.id).sort((a,b) => b.value - a.value)
+    let bonuses = bonusesStore.getBonusesByCard(card.id).sort((a,b) => b.value - a.value)
+    console.log(bonuses)
+    return bonuses
 }
 
 const formatDate = date => {
